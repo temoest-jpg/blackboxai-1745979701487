@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sales - Car Resale Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.tailwindcss.com" />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <header class="mb-6">
+    <h1 class="text-3xl font-bold text-center text-gray-800">Sales Tracking</h1>
+    <nav class="mt-4 flex justify-center space-x-4">
+      <a href="index.html" class="text-blue-600 hover:underline">Inventory</a>
+      <a href="add-car.html" class="text-blue-600 hover:underline">Add Car</a>
+      <a href="sales.html" class="text-blue-600 hover:underline">Sales</a>
+    </nav>
+  </header>
+
+  <main class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+    <section class="mb-8">
+      <h2 class="text-2xl font-semibold mb-4">Add New Sale</h2>
+      <form id="add-sale-form" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label for="carId" class="block text-gray-700 font-semibold mb-1">Car ID</label>
+          <input type="number" id="carId" name="carId" required class="w-full border border-gray-300 rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="buyer" class="block text-gray-700 font-semibold mb-1">Buyer</label>
+          <input type="text" id="buyer" name="buyer" required class="w-full border border-gray-300 rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="date" class="block text-gray-700 font-semibold mb-1">Date</label>
+          <input type="date" id="date" name="date" required class="w-full border border-gray-300 rounded px-3 py-2" />
+        </div>
+        <div class="md:col-span-3 text-center mt-4">
+          <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">Add Sale</button>
+        </div>
+      </form>
+    </section>
+
+    <section>
+      <h2 class="text-2xl font-semibold mb-4">Sales History</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded shadow">
+          <thead>
+            <tr>
+              <th class="py-2 px-4 border-b border-gray-200 text-left">Sale ID</th>
+              <th class="py-2 px-4 border-b border-gray-200 text-left">Car ID</th>
+              <th class="py-2 px-4 border-b border-gray-200 text-left">Buyer</th>
+              <th class="py-2 px-4 border-b border-gray-200 text-left">Date</th>
+            </tr>
+          </thead>
+          <tbody id="sales-list">
+            <!-- Sales rows will be inserted here -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    async function fetchSales() {
+      const response = await fetch('/api/sales');
+      const sales = await response.json();
+      const tbody = document.getElementById('sales-list');
+      tbody.innerHTML = '';
+      sales.forEach(sale => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-50';
+        tr.innerHTML = `
+          <td class="py-2 px-4 border-b border-gray-200">${sale.id}</td>
+          <td class="py-2 px-4 border-b border-gray-200">${sale.carId}</td>
+          <td class="py-2 px-4 border-b border-gray-200">${sale.buyer}</td>
+          <td class="py-2 px-4 border-b border-gray-200">${sale.date}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    document.getElementById('add-sale-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const saleData = {
+        carId: parseInt(form.carId.value),
+        buyer: form.buyer.value.trim(),
+        date: form.date.value
+      };
+      try {
+        const response = await fetch('/api/sales', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(saleData)
+        });
+        if (response.ok) {
+          alert('Sale added successfully!');
+          form.reset();
+          fetchSales();
+        } else {
+          alert('Failed to add sale.');
+        }
+      } catch (error) {
+        alert('Error adding sale.');
+      }
+    });
+
+    fetchSales();
+  </script>
+</body>
+</html>
