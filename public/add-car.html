@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Add Car - Car Resale Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.tailwindcss.com" />
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <header class="mb-6">
+    <h1 class="text-3xl font-bold text-center text-gray-800">Add New Car</h1>
+    <nav class="mt-4 flex justify-center space-x-4">
+      <a href="index.html" class="text-blue-600 hover:underline">Inventory</a>
+      <a href="add-car.html" class="text-blue-600 hover:underline">Add Car</a>
+      <a href="sales.html" class="text-blue-600 hover:underline">Sales</a>
+    </nav>
+  </header>
+
+  <main class="max-w-lg mx-auto bg-white p-6 rounded shadow">
+    <form id="add-car-form" class="space-y-4">
+      <div>
+        <label for="make" class="block text-gray-700 font-semibold mb-1">Make</label>
+        <input type="text" id="make" name="make" required class="w-full border border-gray-300 rounded px-3 py-2" />
+      </div>
+      <div>
+        <label for="model" class="block text-gray-700 font-semibold mb-1">Model</label>
+        <input type="text" id="model" name="model" required class="w-full border border-gray-300 rounded px-3 py-2" />
+      </div>
+      <div>
+        <label for="year" class="block text-gray-700 font-semibold mb-1">Year</label>
+        <input type="number" id="year" name="year" required min="1900" max="2099" class="w-full border border-gray-300 rounded px-3 py-2" />
+      </div>
+      <div>
+        <label for="price" class="block text-gray-700 font-semibold mb-1">Price</label>
+        <input type="number" id="price" name="price" required min="0" step="0.01" class="w-full border border-gray-300 rounded px-3 py-2" />
+      </div>
+      <div>
+        <label for="status" class="block text-gray-700 font-semibold mb-1">Status</label>
+        <select id="status" name="status" required class="w-full border border-gray-300 rounded px-3 py-2">
+          <option value="available">Available</option>
+          <option value="sold">Sold</option>
+        </select>
+      </div>
+      <div class="text-center">
+        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">Add Car</button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    document.getElementById('add-car-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = e.target;
+      const carData = {
+        make: form.make.value.trim(),
+        model: form.model.value.trim(),
+        year: parseInt(form.year.value),
+        price: parseFloat(form.price.value),
+        status: form.status.value
+      };
+      try {
+        const response = await fetch('/api/cars', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(carData)
+        });
+        if (response.ok) {
+          alert('Car added successfully!');
+          window.location.href = 'index.html';
+        } else {
+          alert('Failed to add car.');
+        }
+      } catch (error) {
+        alert('Error adding car.');
+      }
+    });
+  </script>
+</body>
+</html>
